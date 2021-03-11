@@ -87,11 +87,9 @@ var (
         //transfer.ModuleName:           {auth.Minter, auth.Burner},
         microtick.ModuleName:	         {auth.Minter, auth.Burner},
 	}
-	
+
 	// module accounts that are allowed to receive tokens
-	allowedReceivingModAcc = map[string]bool{
-		distr.ModuleName: true,
-	}
+	allowedReceivingModAcc = map[string]bool{}
 )
 
 // Extended ABCI application
