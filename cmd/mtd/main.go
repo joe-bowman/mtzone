@@ -108,6 +108,6 @@ func exportAppStateAndTMValidators(
 		}
 		return mtApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
-	mtApp := app.NewMTApp(logger, db, traceStore, true, uint(1), map[int64]bool{}, "")
+	mtApp := app.NewMTApp(logger, db, traceStore, true, uint(0), map[int64]bool{}, "")
 	return mtApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }
