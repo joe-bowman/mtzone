@@ -54,7 +54,7 @@ proto: $(PROTOC) protovendor
 	@echo "Installing protoc-gen-grpc-gateway"
 	@go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway google.golang.org/protobuf/cmd/protoc-gen-go google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	@echo "Creating protobuf classes"
-	@PATH=$(PATH):$(shell go env GOPATH)/bin ./scripts/protocgen.sh
+	@PATH="$(PATH)":$(shell go env GOPATH)/bin ./scripts/protocgen.sh
 
 .PHONY: js
 js: $(PROTOC) protovendor
