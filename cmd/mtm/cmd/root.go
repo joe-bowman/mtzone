@@ -7,6 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
@@ -46,19 +47,25 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(app.DefaultNodeHome)
+		WithHomeDir(app.DefaultNodeHome).
+		WithViper("")
 
 	rootCmd := &cobra.Command{
 		Use:   "mtm",
 		Short: "Microtick Stargate App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			initClientCtx =client.ReadHomeFlag(initClientCtx, cmd)
+			
+			initClientCtx, err := config.ReadFromClientConfig(initClientCtx)
+			if err != nil {
+				return err
+			}
+			
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
 
-			err2 := server.InterceptConfigsPreRunHandler(cmd)
-			//cmd.DebugFlags()
-			return err2
+			return server.InterceptConfigsPreRunHandler(cmd)
 		},
 	}
 
@@ -80,6 +87,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		tmcli.NewCompletionCmd(rootCmd, true),
 		//testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
+		config.Cmd(),
 	)
 
 	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, createSimappAndExport, addModuleInitFlags)
