@@ -13,7 +13,7 @@ require (
 	github.com/regen-network/cosmos-proto v0.3.1
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.3
-	github.com/tendermint/tendermint v0.34.11
+	github.com/tendermint/tendermint v0.34.13
 	github.com/tendermint/tm-db v0.6.4
 	github.com/vektra/mockery v1.1.2
 	golang.org/x/tools v0.1.0
