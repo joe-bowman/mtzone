@@ -3,7 +3,7 @@ package microtick
 import (
     sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
     sdk "github.com/cosmos/cosmos-sdk/types"
-    
+
     mt "github.com/microtick/mtzone/x/microtick/types"
     "github.com/microtick/mtzone/x/microtick/keeper"
     "github.com/microtick/mtzone/x/microtick/msg"
@@ -31,7 +31,7 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 		case *msg.TxSettleTrade:
 			return msg.HandleTxSettleTrade(ctx, keeper, params, *tmp)
 		default:
-            return nil, sdkerrors.Wrapf(mt.ErrInvalidRequest, "tx type: %v", txmsg.Type())
+            return nil, sdkerrors.Wrapf(mt.ErrInvalidRequest, "tx type: %v", tmp)
 		}
 	}
 }

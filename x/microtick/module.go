@@ -13,7 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	
+
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
 	mt "github.com/microtick/mtzone/x/microtick/types"
@@ -21,8 +21,8 @@ import (
 	"github.com/microtick/mtzone/x/microtick/keeper"
 	"github.com/microtick/mtzone/x/microtick/client/cli"
 	"github.com/microtick/mtzone/x/microtick/client/rest"
-	
-	abci "github.com/tendermint/tendermint/abci/types"	
+
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 const (
@@ -36,7 +36,7 @@ var (
 
 // app module basics object
 type AppModuleBasic struct{
-	cdc codec.Marshaler
+	cdc codec.Codec
 }
 
 // module name
@@ -55,13 +55,13 @@ func (b AppModuleBasic) RegisterInterfaces(registry cdctypes.InterfaceRegistry) 
 
 
 // default genesis state
-func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
+func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	defaultGenesis := mt.DefaultGenesisState()
 	return cdc.MustMarshalJSON(&defaultGenesis)
 }
 
 // module validate genesis
-func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxEncodingConfig, bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncodingConfig, bz json.RawMessage) error {
 	var data mt.GenesisMicrotick
 	err := cdc.UnmarshalJSON(bz, &data)
 	if err != nil {
@@ -85,7 +85,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 }
 
 // get the root tx command of this module
-func (AppModuleBasic) GetTxCmd() *cobra.Command { 
+func (AppModuleBasic) GetTxCmd() *cobra.Command {
 	return cli.GetTxCmd(ModuleName)
 }
 
@@ -97,7 +97,7 @@ type AppModule struct {
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(cdc codec.Marshaler, keeper keeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},
 		keeper:         keeper,
@@ -118,12 +118,12 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 }
 
 // module message route name
-func (am AppModule) Route() sdk.Route { 
+func (am AppModule) Route() sdk.Route {
 	return sdk.NewRoute(ModuleName, NewHandler(am.keeper))
 }
 
 // module handler
-func (am AppModule) NewHandler() sdk.Handler { 
+func (am AppModule) NewHandler() sdk.Handler {
 	return NewHandler(am.keeper)
 }
 
@@ -137,7 +137,7 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sd
 }
 
 // module init-genesis
-func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState mt.GenesisMicrotick
 	cdc.MustUnmarshalJSON(data, &genesisState)
 	InitGenesis(ctx, am.keeper, genesisState)
@@ -145,10 +145,13 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data j
 }
 
 // module export genesis
-func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
+func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
 	return cdc.MustMarshalJSON(&gs)
 }
+
+// ConsensusVersion implements AppModule/ConsensusVersion.
+func (AppModule) ConsensusVersion() uint64 { return 2 }
 
 // module begin-block
 func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}

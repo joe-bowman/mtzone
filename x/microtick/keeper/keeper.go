@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	
+
 	"github.com/tendermint/tendermint/libs/log"
-	
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	
+
 	mt "github.com/microtick/mtzone/x/microtick/types"
 )
 
@@ -25,7 +25,7 @@ const (
 )
 
 type Keeper struct {
-	Codec codec.Marshaler
+	Codec codec.Codec
 	BankKeeper bankkeeper.Keeper
 	AppGlobalsKey sdk.StoreKey
 	accountStatusKey sdk.StoreKey
@@ -37,7 +37,7 @@ type Keeper struct {
 }
 
 func NewKeeper(
-	cdc codec.Marshaler, 
+	cdc codec.Codec,
 	paramSpace paramtypes.Subspace,
 	bankKeeper bankkeeper.Keeper,
 	mtAppGlobalsKey sdk.StoreKey,
