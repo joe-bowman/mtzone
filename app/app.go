@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"fmt"
 	
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -199,17 +198,9 @@ func init() {
 	  os.Mkdir(DefaultNodeHome + "/config", os.ModePerm)
 	  os.Mkdir(DefaultNodeHome + "/data", os.ModePerm)
 	} else {
-	  DefaultNodeHome = filepath.Join(userHomeDir, ".microtick")	
+	  DefaultNodeHome = filepath.Join(userHomeDir, ".microtick")
 	}
-	
-	version.Name = "Microtick"
-	version.AppName = "mtm"
-	version.Version = MTAppVersion
-	version.Commit = MTCommit
-	version.BuildTags = fmt.Sprintf("build_host=%s;build_date=%s", 
-	  MTHostBuild,
-	  MTBuildDate)
-	  
+
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount("micro", "micropub")
   config.SetBech32PrefixForValidator("microvaloper", "microvaloperpub")
@@ -217,7 +208,7 @@ func init() {
 	config.Seal()
 }
 
-// NewApp returns a reference to an initialized Microtick 
+// NewApp returns a reference to an initialized Microtick
 func NewApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig mtparams.EncodingConfig, appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),

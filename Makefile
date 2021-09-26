@@ -1,4 +1,3 @@
-VERSIONFILE=app/version.go
 TEST_DOCKER_REPO=microtick/mtzonetest
 
 export GO111MODULE = on
@@ -24,21 +23,23 @@ MODVENDOR = $(CACHE_BIN)/modvendor
 BUF := $(CACHE_BIN)/buf
 PROTOC := $(CACHE_BIN)/protoc
 
+$(eval override VERSION = $(shell git describe --tags --always 2>/dev/null))
+$(eval override DATE = $(shell date))
+$(eval override HOST = $(shell hostname))
+$(eval override COMMIT = $(shell git log -1 --format='%H'))
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=Microtick \
+	  -X github.com/cosmos/cosmos-sdk/version.AppName=mtm \
+	  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+	  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+	  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=build_host=$(HOST);build_date=$(DATE)"
+
+
 all: install
 
 install:
-	$(eval override VERSION = $(shell git describe --tags --always 2>/dev/null))
-	$(eval override DATE = $(shell date))
-	$(eval override HOST = $(shell hostname))
-	$(eval override COMMIT = $(shell git log -1 --format='%H'))
-	@echo "package app;" > $(VERSIONFILE)
-	@echo "const MTAppVersion = \"mtm v2 ($(VERSION))\"" >> $(VERSIONFILE)
-	@echo "const MTBuildDate = \"$(DATE)\"" >> $(VERSIONFILE)
-	@echo "const MTHostBuild = \"$(HOST)\"" >> $(VERSIONFILE)
-	@echo "const MTCommit = \"$(COMMIT)\"" >> $(VERSIONFILE)
-	$(GO) install -mod=mod -tags="netgo ledger" ./cmd/mtm
+	$(GO) install -mod=mod -tags="netgo ledger" -ldflags='$(ldflags)' ./cmd/mtm
 	@mv $(shell go env GOPATH)/bin/mtm .
-	
+
 ifeq ($(UNAME_OS),Linux)
   PROTOC_ZIP ?= protoc-${PROTOC_VERSION}-linux-x86_64.zip
 endif
